@@ -1,40 +1,90 @@
+<div align="center">
+
 # Rentiful
 
-A full-stack rental property marketplace. Tenants can search, filter, and apply for properties. Managers can list properties, review applications, and manage leases.
+**Full-stack rental property marketplace — production-grade architecture, custom auth, spatial search.**
+
+[![Next.js](https://img.shields.io/badge/Next.js_15-0d1117?style=flat-square&logo=nextdotjs&logoColor=58a6ff)](https://nextjs.org)
+[![Express](https://img.shields.io/badge/Express-0d1117?style=flat-square&logo=express&logoColor=58a6ff)](https://expressjs.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-0d1117?style=flat-square&logo=typescript&logoColor=58a6ff)](https://www.typescriptlang.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL_+_PostGIS-0d1117?style=flat-square&logo=postgresql&logoColor=58a6ff)](https://postgis.net)
+[![Prisma](https://img.shields.io/badge/Prisma-0d1117?style=flat-square&logo=prisma&logoColor=58a6ff)](https://prisma.io)
+[![Neon](https://img.shields.io/badge/Neon-0d1117?style=flat-square&logo=neon&logoColor=58a6ff)](https://neon.tech)
+[![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-0d1117?style=flat-square&logo=redux&logoColor=58a6ff)](https://redux-toolkit.js.org)
+[![Mapbox](https://img.shields.io/badge/Mapbox_GL-0d1117?style=flat-square&logo=mapbox&logoColor=58a6ff)](https://mapbox.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-0d1117?style=flat-square&logo=tailwindcss&logoColor=58a6ff)](https://tailwindcss.com)
+
+</div>
+
+---
+
+## Overview
+
+Rentiful is a full-stack rental property platform built for tenants to discover and apply for properties, and for property managers to list, manage, and approve tenants — all through a clean, role-aware interface.
+
+This project is a deliberate exercise in **production-ready architecture**: custom JWT auth replacing a managed identity provider, PostGIS-powered spatial search, feature-based monorepo structure on both client and server, and a set of security and performance fixes applied systematically across the stack.
+
+---
+
+## Architectural Decisions Worth Noting
+
+**Custom JWT auth over managed identity (Cognito)**
+The original codebase used AWS Cognito with `jwt.decode()` — no signature verification, meaning any client could forge a token. This was replaced with `bcryptjs` + `jsonwebtoken` using `jwt.verify()` against a server-held secret, with a unified `User` model (replacing separate `Manager`/`Tenant` tables) and role stored in the token payload.
+
+**PostGIS spatial queries with Neon**
+Property search uses raw `ST_DWithin` + `ST_SetSRID` PostGIS queries via Prisma's `$queryRaw`, parameterized to prevent injection. Neon provides the serverless PostgreSQL layer with pooled + direct URL support for Prisma's connection management.
+
+**Feature-based architecture on both ends**
+Both the Express server and Next.js client are organized by domain feature rather than by file type. Each server feature owns its controller, routes, and any feature-specific middleware. The client separates feature components, shared UI, and state cleanly.
+
+**RTK Query with proper cache invalidation**
+All API calls go through RTK Query endpoints with typed tag-based cache invalidation. Mutations invalidate only the tags they affect, preventing stale data without over-fetching.
+
+**Duplicate lease bug fixed**
+The original code created a `Lease` record immediately when an application was submitted, then created a second one on manager approval — leaving orphaned leases on every denial. Applications now create no lease; the lease is created inside a Prisma transaction only on approval, atomically connecting the tenant to the property.
 
 ---
 
 ## Tech Stack
 
-**Client**
-- Next.js 15 (App Router) + React 19
-- TypeScript
-- Tailwind CSS + shadcn/ui
-- Redux Toolkit + RTK Query
-- Mapbox GL (property maps)
-- Framer Motion
-- Zod (form validation)
+<table>
+<tr>
+<td valign="top" width="50%">
 
-**Server**
-- Node.js + Express
-- TypeScript
-- Prisma ORM
-- PostgreSQL + PostGIS (via Neon)
-- JWT (bcryptjs + jsonwebtoken)
-- Multer (file uploads)
+**Frontend**
 
----
+![React 19](https://img.shields.io/badge/React_19-0d1117?style=flat-square&logo=react&logoColor=58a6ff)
+![Next.js 15](https://img.shields.io/badge/Next.js_15_App_Router-0d1117?style=flat-square&logo=nextdotjs&logoColor=58a6ff)
+![TypeScript](https://img.shields.io/badge/TypeScript-0d1117?style=flat-square&logo=typescript&logoColor=58a6ff)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-0d1117?style=flat-square&logo=tailwindcss&logoColor=58a6ff)
+![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-0d1117?style=flat-square&logo=shadcnui&logoColor=58a6ff)
+![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-0d1117?style=flat-square&logo=redux&logoColor=58a6ff)
+![RTK Query](https://img.shields.io/badge/RTK_Query-0d1117?style=flat-square&logo=redux&logoColor=58a6ff)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-0d1117?style=flat-square&logo=framer&logoColor=58a6ff)
+![React Hook Form](https://img.shields.io/badge/React_Hook_Form-0d1117?style=flat-square&logo=reacthookform&logoColor=58a6ff)
+![Zod](https://img.shields.io/badge/Zod-0d1117?style=flat-square&logo=zod&logoColor=58a6ff)
+![Mapbox GL](https://img.shields.io/badge/Mapbox_GL-0d1117?style=flat-square&logo=mapbox&logoColor=58a6ff)
 
-## Features
+</td>
+<td valign="top" width="50%">
 
-- **Auth**: Register and sign in as a tenant or property manager. Role-based access enforced on all protected routes.
-- **Property search**: Filter by price, beds, baths, property type, amenities, square footage, availability date, and map radius.
-- **Paginated listings**: Grid and list view with Mapbox markers.
-- **Applications**: Tenants submit rental applications. Managers approve or deny. Lease is created only on approval.
-- **Favorites**: Tenants save and manage favorite properties.
-- **Leases**: View active leases and payment history scoped to the authenticated user.
-- **Settings**: Update name, email, and phone number.
-- **File uploads**: Property photos stored locally, validated by type (JPEG/PNG/WebP/AVIF) and size (10MB max).
+**Backend**
+
+![Node.js](https://img.shields.io/badge/Node.js-0d1117?style=flat-square&logo=nodedotjs&logoColor=58a6ff)
+![Express](https://img.shields.io/badge/Express-0d1117?style=flat-square&logo=express&logoColor=58a6ff)
+![TypeScript](https://img.shields.io/badge/TypeScript-0d1117?style=flat-square&logo=typescript&logoColor=58a6ff)
+![Prisma](https://img.shields.io/badge/Prisma-0d1117?style=flat-square&logo=prisma&logoColor=58a6ff)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-0d1117?style=flat-square&logo=postgresql&logoColor=58a6ff)
+![PostGIS](https://img.shields.io/badge/PostGIS-0d1117?style=flat-square&logo=postgresql&logoColor=58a6ff)
+![Neon](https://img.shields.io/badge/Neon-0d1117?style=flat-square&logo=neon&logoColor=58a6ff)
+![JWT](https://img.shields.io/badge/JWT-0d1117?style=flat-square&logo=jsonwebtokens&logoColor=58a6ff)
+![bcryptjs](https://img.shields.io/badge/bcryptjs-0d1117?style=flat-square&logo=letsencrypt&logoColor=58a6ff)
+![Helmet](https://img.shields.io/badge/Helmet-0d1117?style=flat-square&logo=express&logoColor=58a6ff)
+![Multer](https://img.shields.io/badge/Multer-0d1117?style=flat-square&logo=nodedotjs&logoColor=58a6ff)
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -42,35 +92,74 @@ A full-stack rental property marketplace. Tenants can search, filter, and apply 
 
 ```
 rentiful/
-├── client/                  # Next.js frontend
+├── client/
 │   └── src/
-│       ├── app/             # Pages (Next.js App Router)
-│       │   ├── (auth)/      # Sign in / sign up
-│       │   ├── (dashboard)/ # Tenant + manager dashboards
-│       │   └── (nondashboard)/ # Landing + property search
+│       ├── app/                        # Next.js App Router pages
+│       │   ├── (auth)/                 # /signin  /signup
+│       │   ├── (dashboard)/            # /managers/*  /tenants/*
+│       │   └── (nondashboard)/         # /  /search  /search/[id]
 │       ├── features/
-│       │   ├── auth/        # AuthProvider, token utils
-│       │   ├── properties/  # Card, CardCompact, enums/icons
-│       │   ├── applications/# ApplicationCard
-│       │   └── settings/    # SettingsForm
+│       │   ├── auth/                   # AuthProvider + token utils
+│       │   ├── properties/             # Card, CardCompact, enums/icons
+│       │   ├── applications/           # ApplicationCard
+│       │   └── settings/              # SettingsForm
 │       └── shared/
-│           ├── components/  # Navbar, Header, Loading, ui/
-│           ├── hooks/
-│           ├── lib/         # utils, schemas
-│           ├── state/       # Redux store, RTK Query API, global slice
-│           └── types/
+│           ├── components/             # Navbar, Header, Loading, ui/
+│           ├── lib/                    # utils, schemas
+│           └── state/                  # Redux store, RTK Query API, global slice
 │
-└── server/                  # Express backend
+└── server/
     └── src/
         ├── features/
-        │   ├── auth/        # controller, middleware, routes
-        │   ├── properties/  # controller, routes
-        │   ├── applications/# controller, routes
-        │   ├── leases/      # controller, routes
-        │   ├── tenants/     # controller, routes
-        │   └── managers/    # controller, routes
+        │   ├── auth/                   # controller · middleware · routes
+        │   ├── properties/             # controller · routes
+        │   ├── applications/           # controller · routes
+        │   ├── leases/                 # controller · routes
+        │   ├── tenants/               # controller · routes
+        │   └── managers/              # controller · routes
         └── lib/
-            └── prisma.ts    # Prisma singleton
+            └── prisma.ts              # Singleton client (connection pooling)
+```
+
+---
+
+## Data Model
+
+```
+User ──────────────────────────────────────────────────────────────
+  id           String (UUID, PK)
+  email        String (unique)
+  passwordHash String
+  role         tenant | manager
+  name, phoneNumber
+
+Property ──────────────────────────────────────────────────────────
+  managerId    → User
+  locationId   → Location
+  propertyType Rooms | Tinyhouse | Apartment | Villa | Townhouse | Cottage
+  amenities    Amenity[]  ·  highlights  Highlight[]
+  photoUrls    String[]
+  pricePerMonth, securityDeposit, applicationFee
+  beds, baths, squareFeet
+  isPetsAllowed, isParkingIncluded
+
+Location ──────────────────────────────────────────────────────────
+  coordinates  geography(Point, 4326)   ← PostGIS
+
+Application ───────────────────────────────────────────────────────
+  tenantId     → User
+  propertyId   → Property
+  status       Pending | Approved | Denied
+  leaseId      → Lease   (null until Approved)
+
+Lease ─────────────────────────────────────────────────────────────
+  tenantId     → User
+  propertyId   → Property
+  startDate, endDate, rent, deposit
+
+Payment ────────────────────────────────────────────────────────────
+  leaseId      → Lease
+  paymentStatus  Pending | Paid | PartiallyPaid | Overdue
 ```
 
 ---
@@ -78,74 +167,57 @@ rentiful/
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js 18+
-- A [Neon](https://neon.tech) PostgreSQL database with the PostGIS extension enabled
-- A [Mapbox](https://mapbox.com) account (for map tiles)
+- [Neon](https://neon.tech) database with PostGIS extension enabled
+- [Mapbox](https://mapbox.com) access token
 
-### 1. Clone the repo
+### 1. Clone
 
 ```bash
 git clone https://github.com/cirostackdev/RENTIFUL.git
 cd RENTIFUL
 ```
 
-### 2. Configure environment variables
-
-**Server** — copy and fill in `server/.env.example`:
+### 2. Environment
 
 ```bash
 cp server/.env.example server/.env
+cp client/.env.example client/.env.local
 ```
 
+**`server/.env`**
 ```env
-DATABASE_URL="postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/rentiful?sslmode=require"
-DIRECT_DATABASE_URL="postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/rentiful?sslmode=require"
-JWT_SECRET="your-secure-random-secret-min-32-chars"
+DATABASE_URL="postgresql://user:password@ep-xxx.neon.tech/rentiful?sslmode=require"
+DIRECT_DATABASE_URL="postgresql://user:password@ep-xxx.neon.tech/rentiful?sslmode=require"
+JWT_SECRET="min-32-char-random-secret"
 PORT=3002
 CLIENT_URL="http://localhost:3000"
 NODE_ENV="development"
 ```
 
-**Client** — copy and fill in `client/.env.example`:
-
-```bash
-cp client/.env.example client/.env.local
-```
-
+**`client/.env.local`**
 ```env
 NEXT_PUBLIC_API_BASE_URL="http://localhost:3002"
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN="your-mapbox-token"
 ```
 
-### 3. Set up the database
+### 3. Database
+
+Enable PostGIS in your Neon project under **Extensions**, then:
 
 ```bash
-cd server
-npm install
-npx prisma db push
+cd server && npm install && npx prisma db push
 ```
 
-> Neon requires PostGIS. Enable it in your Neon project under **Extensions** before running `db push`.
-
-### 4. Run the server
+### 4. Run
 
 ```bash
-cd server
-npm run dev
+# Terminal 1
+cd server && npm run dev      # → http://localhost:3002
+
+# Terminal 2
+cd client && npm install && npm run dev   # → http://localhost:3000
 ```
-
-Server starts on `http://localhost:3002`.
-
-### 5. Run the client
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-Client starts on `http://localhost:3000`.
 
 ---
 
@@ -155,188 +227,79 @@ Client starts on `http://localhost:3000`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/auth/register` | None | Register a new user |
-| POST | `/auth/login` | None | Sign in, returns JWT |
-| GET | `/auth/me` | Required | Get current user |
-| PUT | `/auth/me` | Required | Update profile |
+| `POST` | `/auth/register` | — | Register (`email`, `password`, `name`, `role`, `phoneNumber`) |
+| `POST` | `/auth/login` | — | Sign in → `{ token, user }` |
+| `GET` | `/auth/me` | ✓ | Current user |
+| `PUT` | `/auth/me` | ✓ | Update profile |
 
-**Register body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "password123",
-  "name": "Jane Doe",
-  "role": "tenant",
-  "phoneNumber": "555-0100"
-}
-```
-
-**Login response:**
-```json
-{
-  "token": "<jwt>",
-  "user": { "id": "...", "email": "...", "role": "tenant", "name": "...", "phoneNumber": "..." }
-}
-```
+All protected routes require `Authorization: Bearer <token>`.
 
 ### Properties
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/properties` | None | List properties (paginated, filterable) |
-| GET | `/properties/:id` | None | Get single property |
-| POST | `/properties` | Manager | Create property (multipart/form-data) |
+| `GET` | `/properties` | — | Paginated, filterable list |
+| `GET` | `/properties/:id` | — | Single property with coordinates |
+| `POST` | `/properties` | Manager | Create (`multipart/form-data`) |
 
-**GET /properties query params:**
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `page` | number | Page number (default: 1) |
-| `limit` | number | Results per page (default: 20, max: 100) |
-| `priceMin` | number | Minimum monthly rent |
-| `priceMax` | number | Maximum monthly rent |
-| `beds` | number \| `"any"` | Minimum bedrooms |
-| `baths` | number \| `"any"` | Minimum bathrooms |
-| `propertyType` | string \| `"any"` | `Rooms`, `Apartment`, `Villa`, etc. |
-| `amenities` | string | Comma-separated amenity list |
-| `squareFeetMin` | number | Minimum square footage |
-| `squareFeetMax` | number | Maximum square footage |
-| `availableFrom` | date | Filter by lease start date |
-| `latitude` | number | Map center latitude |
-| `longitude` | number | Map center longitude |
-| `favoriteIds` | string | Comma-separated property IDs |
+**Filter params:** `page`, `limit`, `priceMin`, `priceMax`, `beds`, `baths`, `propertyType`, `amenities`, `squareFeetMin`, `squareFeetMax`, `availableFrom`, `latitude`, `longitude`, `favoriteIds`
 
 ### Applications
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/applications?userId=&userType=` | Tenant/Manager | List applications |
-| POST | `/applications` | Tenant | Submit application |
-| PUT | `/applications/:id/status` | Manager | Approve or deny |
+| `GET` | `/applications?userId=&userType=` | ✓ | List by user |
+| `POST` | `/applications` | Tenant | Submit (one active per property) |
+| `PUT` | `/applications/:id/status` | Manager | `Approved` or `Denied` |
 
 ### Leases
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/leases` | Tenant/Manager | Get leases for current user |
-| GET | `/leases/:id/payments` | Tenant/Manager | Get payment history |
+| `GET` | `/leases` | ✓ | Current user's leases |
+| `GET` | `/leases/:id/payments` | ✓ | Payment history |
 
 ### Tenants
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/tenants/:userId` | Required | Get tenant profile |
-| GET | `/tenants/:userId/current-residences` | Required | Get active rentals |
-| POST | `/tenants/:userId/favorites/:propertyId` | Required | Add favorite |
-| DELETE | `/tenants/:userId/favorites/:propertyId` | Required | Remove favorite |
+| `GET` | `/tenants/:userId` | ✓ | Profile + favorites |
+| `GET` | `/tenants/:userId/current-residences` | ✓ | Active rentals |
+| `POST` | `/tenants/:userId/favorites/:propertyId` | ✓ | Add favorite |
+| `DELETE` | `/tenants/:userId/favorites/:propertyId` | ✓ | Remove favorite |
 
 ### Managers
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/managers/:userId` | Required | Get manager profile |
-| GET | `/managers/:userId/properties` | Required | Get manager's listings |
-
----
-
-## Data Models
-
-```
-User
-  id           String (UUID)
-  email        String (unique)
-  passwordHash String
-  role         tenant | manager
-  name         String
-  phoneNumber  String
-
-Property
-  id                Int
-  name, description String
-  pricePerMonth     Float
-  securityDeposit   Float
-  applicationFee    Float
-  beds, baths       Int/Float
-  squareFeet        Int
-  propertyType      Rooms | Tinyhouse | Apartment | Villa | Townhouse | Cottage
-  amenities         Amenity[]
-  highlights        Highlight[]
-  isPetsAllowed     Boolean
-  isParkingIncluded Boolean
-  photoUrls         String[]
-  managerId         String → User
-
-Location
-  id         Int
-  address, city, state, country, postalCode
-  coordinates  geography(Point, 4326)  -- PostGIS
-
-Application
-  id              Int
-  status          Pending | Approved | Denied
-  propertyId      Int → Property
-  tenantId        String → User
-  leaseId         Int? → Lease (set on approval)
-
-Lease
-  id         Int
-  startDate  DateTime
-  endDate    DateTime
-  rent       Float
-  deposit    Float
-  propertyId Int → Property
-  tenantId   String → User
-
-Payment
-  id            Int
-  amountDue     Float
-  amountPaid    Float
-  dueDate       DateTime
-  paymentStatus Pending | Paid | PartiallyPaid | Overdue
-  leaseId       Int → Lease
-```
-
----
-
-## Authentication
-
-All protected routes require a `Bearer` token in the `Authorization` header:
-
-```
-Authorization: Bearer <jwt>
-```
-
-The token is issued at login/register, stored in `localStorage`, and attached to every API request by RTK Query's `prepareHeaders`. Tokens expire after 7 days.
+| `GET` | `/managers/:userId` | ✓ | Profile |
+| `GET` | `/managers/:userId/properties` | ✓ | Listings |
 
 ---
 
 ## Scripts
 
-### Server
-
 ```bash
-npm run dev          # Start with ts-node + nodemon
-npm run build        # Compile TypeScript to dist/
+# Server
+npm run dev          # ts-node + nodemon
+npm run build        # Compile to dist/
 npm run start        # Run compiled output
-npx prisma db push   # Push schema to database
-npx prisma generate  # Regenerate Prisma client
-npx prisma studio    # Open database GUI
-```
+npx prisma db push   # Sync schema → database
+npx prisma studio    # Database GUI
 
-### Client
-
-```bash
-npm run dev     # Start Next.js dev server
-npm run build   # Production build
-npm run start   # Serve production build
-npm run lint    # Run ESLint
+# Client
+npm run dev          # Next.js dev server
+npm run build        # Production build
+npm run lint         # ESLint
 ```
 
 ---
 
-## Windows Note
+<div align="center">
 
-npm may show `TAR_ENTRY_ERROR` warnings during install due to the Windows 260-character path limit. These are non-fatal. To avoid them entirely, enable long paths:
+Built by [Jessy Chidera Onah](https://github.com/cirostackdev) · Co-Founder @ [CiroStack](https://github.com/cirostackdev)
 
-1. Run `git config --system core.longpaths true`
-2. Enable **Win32 Long Paths** in Group Policy or registry (`HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled = 1`)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/jessyonah)
+[![Email](https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:jessychideraonah@gmail.com)
+
+</div>
