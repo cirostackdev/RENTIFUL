@@ -90,41 +90,40 @@ Applications carry a `leaseId` that starts null. On manager approval, the lease 
 
 ## Project Structure
 
-<details>
-<summary>Show directory tree</summary>
+```mermaid
+graph LR
+    root["rentiful/"]
 
-```
-rentiful/
-├── client/
-│   └── src/
-│       ├── app/                        # Next.js App Router pages
-│       │   ├── (auth)/                 # /signin  /signup
-│       │   ├── (dashboard)/            # /managers/*  /tenants/*
-│       │   └── (nondashboard)/         # /  /search  /search/[id]
-│       ├── features/
-│       │   ├── auth/                   # AuthProvider + token utils
-│       │   ├── properties/             # Card, CardCompact, enums/icons
-│       │   ├── applications/           # ApplicationCard
-│       │   └── settings/              # SettingsForm
-│       └── shared/
-│           ├── components/             # Navbar, Header, Loading, ui/
-│           ├── lib/                    # utils, schemas
-│           └── state/                  # Redux store, RTK Query API, global slice
-│
-└── server/
-    └── src/
-        ├── features/
-        │   ├── auth/                   # controller · middleware · routes
-        │   ├── properties/             # controller · routes
-        │   ├── applications/           # controller · routes
-        │   ├── leases/                 # controller · routes
-        │   ├── tenants/               # controller · routes
-        │   └── managers/              # controller · routes
-        └── lib/
-            └── prisma.ts              # Singleton client (connection pooling)
-```
+    root --> client["client/src/"]
+    root --> server["server/src/"]
 
-</details>
+    client --> app["app/\nApp Router pages"]
+    client --> features_c["features/"]
+    client --> shared["shared/"]
+
+    app --> auth_p["(auth)/\n/signin · /signup"]
+    app --> dash_p["(dashboard)/\n/managers/* · /tenants/*"]
+    app --> nondash_p["(nondashboard)/\n/ · /search · /search/[id]"]
+
+    features_c --> auth_f["auth/\nAuthProvider + token utils"]
+    features_c --> props_f["properties/\nCard, CardCompact, enums"]
+    features_c --> apps_f["applications/\nApplicationCard"]
+    features_c --> settings_f["settings/\nSettingsForm"]
+
+    shared --> comp["components/\nNavbar, Header, ui/"]
+    shared --> lib_c["lib/\nutils, schemas"]
+    shared --> state["state/\nRedux store + RTK Query"]
+
+    server --> features_s["features/"]
+    server --> lib_s["lib/\nprisma.ts — singleton client"]
+
+    features_s --> auth_s["auth/\ncontroller · middleware · routes"]
+    features_s --> props_s["properties/\ncontroller · routes"]
+    features_s --> apps_s["applications/\ncontroller · routes"]
+    features_s --> leases_s["leases/\ncontroller · routes"]
+    features_s --> tenants_s["tenants/\ncontroller · routes"]
+    features_s --> managers_s["managers/\ncontroller · routes"]
+```
 
 ---
 
