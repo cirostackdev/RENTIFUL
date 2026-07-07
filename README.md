@@ -2,7 +2,7 @@
 
 # Rentiful
 
-**Full-stack rental property marketplace — production-grade architecture, custom auth, spatial search.**
+**Full-stack rental property marketplace: production-grade architecture, custom auth, spatial search.**
 
 [![Next.js](https://img.shields.io/badge/Next.js_15-0d1117?style=flat-square&logo=nextdotjs&logoColor=58a6ff)](https://nextjs.org)
 [![Express](https://img.shields.io/badge/Express-0d1117?style=flat-square&logo=express&logoColor=58a6ff)](https://expressjs.com)
@@ -20,7 +20,7 @@
 
 ## Overview
 
-Rentiful is a full-stack rental property platform built for tenants to discover and apply for properties, and for property managers to list, manage, and approve tenants — all through a clean, role-aware interface.
+Rentiful is a full-stack rental property platform built for tenants to discover and apply for properties, and for property managers to list, manage, and approve tenants. The interface is clean and role-aware throughout.
 
 This project is a deliberate exercise in **production-ready architecture**: custom JWT auth replacing a managed identity provider, PostGIS-powered spatial search, feature-based monorepo structure on both client and server, and a set of security and performance fixes applied systematically across the stack.
 
@@ -29,7 +29,7 @@ This project is a deliberate exercise in **production-ready architecture**: cust
 ## Architectural Decisions Worth Noting
 
 **Custom JWT auth over managed identity (Cognito)**
-The original codebase used AWS Cognito with `jwt.decode()` — no signature verification, meaning any client could forge a token. This was replaced with `bcryptjs` + `jsonwebtoken` using `jwt.verify()` against a server-held secret, with a unified `User` model (replacing separate `Manager`/`Tenant` tables) and role stored in the token payload.
+The original codebase used AWS Cognito with `jwt.decode()` (no signature verification), meaning any client could forge a token. This was replaced with `bcryptjs` + `jsonwebtoken` using `jwt.verify()` against a server-held secret, with a unified `User` model (replacing separate `Manager`/`Tenant` tables) and role stored in the token payload.
 
 **PostGIS spatial queries with Neon**
 Property search uses raw `ST_DWithin` + `ST_SetSRID` PostGIS queries via Prisma's `$queryRaw`, parameterized to prevent injection. Neon provides the serverless PostgreSQL layer with pooled + direct URL support for Prisma's connection management.
@@ -41,7 +41,7 @@ Both the Express server and Next.js client are organized by domain feature rathe
 All API calls go through RTK Query endpoints with typed tag-based cache invalidation. Mutations invalidate only the tags they affect, preventing stale data without over-fetching.
 
 **Duplicate lease bug fixed**
-The original code created a `Lease` record immediately when an application was submitted, then created a second one on manager approval — leaving orphaned leases on every denial. Applications now create no lease; the lease is created inside a Prisma transaction only on approval, atomically connecting the tenant to the property.
+The original code created a `Lease` record immediately when an application was submitted, then created a second one on manager approval, leaving orphaned leases on every denial. Applications now create no lease; the lease is created inside a Prisma transaction only on approval, atomically connecting the tenant to the property.
 
 ---
 
@@ -227,8 +227,8 @@ cd client && npm install && npm run dev   # → http://localhost:3000
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/auth/register` | — | Register (`email`, `password`, `name`, `role`, `phoneNumber`) |
-| `POST` | `/auth/login` | — | Sign in → `{ token, user }` |
+| `POST` | `/auth/register` | None | Register (`email`, `password`, `name`, `role`, `phoneNumber`) |
+| `POST` | `/auth/login` | None | Sign in → `{ token, user }` |
 | `GET` | `/auth/me` | ✓ | Current user |
 | `PUT` | `/auth/me` | ✓ | Update profile |
 
@@ -238,8 +238,8 @@ All protected routes require `Authorization: Bearer <token>`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `GET` | `/properties` | — | Paginated, filterable list |
-| `GET` | `/properties/:id` | — | Single property with coordinates |
+| `GET` | `/properties` | None | Paginated, filterable list |
+| `GET` | `/properties/:id` | None | Single property with coordinates |
 | `POST` | `/properties` | Manager | Create (`multipart/form-data`) |
 
 **Filter params:** `page`, `limit`, `priceMin`, `priceMax`, `beds`, `baths`, `propertyType`, `amenities`, `squareFeetMin`, `squareFeetMax`, `availableFrom`, `latitude`, `longitude`, `favoriteIds`
