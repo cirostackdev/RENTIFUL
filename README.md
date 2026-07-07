@@ -92,42 +92,42 @@ Applications carry a `leaseId` that starts null. On manager approval, the lease 
 
 ```mermaid
 graph LR
-    root["<font color=#58a6ff>rentiful</font>"]
+    root["<font color=#58a6ff>rentiful"]
 
-    root --> client["<font color=#58a6ff>client</font>"]
-    root --> server["<font color=#58a6ff>server</font>"]
+    root --> client["<font color=#58a6ff>client"]
+    root --> server["<font color=#58a6ff>server"]
 
-    client --> csrc["<font color=#58a6ff>src</font>"]
-    server --> ssrc["<font color=#58a6ff>src</font>"]
+    client --> csrc["<font color=#58a6ff>src"]
+    server --> ssrc["<font color=#58a6ff>src"]
 
-    csrc --> app["<font color=#58a6ff>app</font><br/><font color=#3fb950>App Router pages</font>"]
-    csrc --> features_c["<font color=#58a6ff>features</font>"]
-    csrc --> shared["<font color=#58a6ff>shared</font>"]
+    csrc --> app["<font color=#58a6ff>app</font><br/>App Router pages"]
+    csrc --> features_c["<font color=#58a6ff>features"]
+    csrc --> shared["<font color=#58a6ff>shared"]
 
-    app --> auth_p["<font color=#58a6ff>(auth)</font><br/><font color=#3fb950>/signin · /signup</font>"]
-    app --> dash_p["<font color=#58a6ff>(dashboard)</font><br/><font color=#3fb950>/managers/* · /tenants/*</font>"]
-    app --> nondash_p["<font color=#58a6ff>(nondashboard)</font><br/><font color=#3fb950>/ · /search · /search/[id]</font>"]
+    app --> auth_p["<font color=#58a6ff>(auth)</font><br/>/signin · /signup"]
+    app --> dash_p["<font color=#58a6ff>(dashboard)</font><br/>/managers/* · /tenants/*"]
+    app --> nondash_p["<font color=#58a6ff>(nondashboard)</font><br/>/ · /search · /search/[id]"]
 
-    features_c --> auth_f["<font color=#58a6ff>auth</font><br/><font color=#3fb950>AuthProvider + token utils</font>"]
-    features_c --> props_f["<font color=#58a6ff>properties</font><br/><font color=#3fb950>Card, CardCompact, enums</font>"]
-    features_c --> apps_f["<font color=#58a6ff>applications</font><br/><font color=#3fb950>ApplicationCard</font>"]
-    features_c --> settings_f["<font color=#58a6ff>settings</font><br/><font color=#3fb950>SettingsForm</font>"]
+    features_c --> auth_f["<font color=#58a6ff>auth</font><br/>AuthProvider + token utils"]
+    features_c --> props_f["<font color=#58a6ff>properties</font><br/>Card, CardCompact, enums"]
+    features_c --> apps_f["<font color=#58a6ff>applications</font><br/>ApplicationCard"]
+    features_c --> settings_f["<font color=#58a6ff>settings</font><br/>SettingsForm"]
 
-    shared --> comp["<font color=#58a6ff>components</font><br/><font color=#3fb950>Navbar, Header, ui</font>"]
-    shared --> lib_c["<font color=#58a6ff>lib</font><br/><font color=#3fb950>utils, schemas</font>"]
-    shared --> state["<font color=#58a6ff>state</font><br/><font color=#3fb950>Redux store + RTK Query</font>"]
+    shared --> comp["<font color=#58a6ff>components</font><br/>Navbar, Header, ui"]
+    shared --> lib_c["<font color=#58a6ff>lib</font><br/>utils, schemas"]
+    shared --> state["<font color=#58a6ff>state</font><br/>Redux store + RTK Query"]
 
-    ssrc --> features_s["<font color=#58a6ff>features</font>"]
-    ssrc --> lib_s["<font color=#58a6ff>lib</font>"]
+    ssrc --> features_s["<font color=#58a6ff>features"]
+    ssrc --> lib_s["<font color=#58a6ff>lib"]
 
-    features_s --> auth_s["<font color=#58a6ff>auth</font><br/><font color=#3fb950>controller · middleware · routes</font>"]
-    features_s --> props_s["<font color=#58a6ff>properties</font><br/><font color=#3fb950>controller · routes</font>"]
-    features_s --> apps_s["<font color=#58a6ff>applications</font><br/><font color=#3fb950>controller · routes</font>"]
-    features_s --> leases_s["<font color=#58a6ff>leases</font><br/><font color=#3fb950>controller · routes</font>"]
-    features_s --> tenants_s["<font color=#58a6ff>tenants</font><br/><font color=#3fb950>controller · routes</font>"]
-    features_s --> managers_s["<font color=#58a6ff>managers</font><br/><font color=#3fb950>controller · routes</font>"]
+    features_s --> auth_s["<font color=#58a6ff>auth</font><br/>controller · middleware · routes"]
+    features_s --> props_s["<font color=#58a6ff>properties</font><br/>controller · routes"]
+    features_s --> apps_s["<font color=#58a6ff>applications</font><br/>controller · routes"]
+    features_s --> leases_s["<font color=#58a6ff>leases</font><br/>controller · routes"]
+    features_s --> tenants_s["<font color=#58a6ff>tenants</font><br/>controller · routes"]
+    features_s --> managers_s["<font color=#58a6ff>managers</font><br/>controller · routes"]
 
-    lib_s --> prisma["<font color=#58a6ff>prisma.ts</font><br/><font color=#3fb950>singleton client</font>"]
+    lib_s --> prisma["<font color=#58a6ff>prisma.ts</font><br/>singleton client"]
 ```
 
 ---
