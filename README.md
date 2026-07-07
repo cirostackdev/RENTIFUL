@@ -92,37 +92,42 @@ Applications carry a `leaseId` that starts null. On manager approval, the lease 
 
 ```mermaid
 graph LR
-    root["rentiful/"]
+    root["rentiful"]
 
-    root --> client["client/src/"]
-    root --> server["server/src/"]
+    root --> client["client"]
+    root --> server["server"]
 
-    client --> app["app/\nApp Router pages"]
-    client --> features_c["features/"]
-    client --> shared["shared/"]
+    client --> csrc["src"]
+    server --> ssrc["src"]
 
-    app --> auth_p["(auth)/\n/signin · /signup"]
-    app --> dash_p["(dashboard)/\n/managers/* · /tenants/*"]
-    app --> nondash_p["(nondashboard)/\n/ · /search · /search/[id]"]
+    csrc --> app["app\nApp Router pages"]
+    csrc --> features_c["features"]
+    csrc --> shared["shared"]
 
-    features_c --> auth_f["auth/\nAuthProvider + token utils"]
-    features_c --> props_f["properties/\nCard, CardCompact, enums"]
-    features_c --> apps_f["applications/\nApplicationCard"]
-    features_c --> settings_f["settings/\nSettingsForm"]
+    app --> auth_p["(auth)\n/signin · /signup"]
+    app --> dash_p["(dashboard)\n/managers/* · /tenants/*"]
+    app --> nondash_p["(nondashboard)\n/ · /search · /search/[id]"]
 
-    shared --> comp["components/\nNavbar, Header, ui/"]
-    shared --> lib_c["lib/\nutils, schemas"]
-    shared --> state["state/\nRedux store + RTK Query"]
+    features_c --> auth_f["auth\nAuthProvider + token utils"]
+    features_c --> props_f["properties\nCard, CardCompact, enums"]
+    features_c --> apps_f["applications\nApplicationCard"]
+    features_c --> settings_f["settings\nSettingsForm"]
 
-    server --> features_s["features/"]
-    server --> lib_s["lib/\nprisma.ts — singleton client"]
+    shared --> comp["components\nNavbar, Header, ui"]
+    shared --> lib_c["lib\nutils, schemas"]
+    shared --> state["state\nRedux store + RTK Query"]
 
-    features_s --> auth_s["auth/\ncontroller · middleware · routes"]
-    features_s --> props_s["properties/\ncontroller · routes"]
-    features_s --> apps_s["applications/\ncontroller · routes"]
-    features_s --> leases_s["leases/\ncontroller · routes"]
-    features_s --> tenants_s["tenants/\ncontroller · routes"]
-    features_s --> managers_s["managers/\ncontroller · routes"]
+    ssrc --> features_s["features"]
+    ssrc --> lib_s["lib"]
+
+    features_s --> auth_s["auth\ncontroller · middleware · routes"]
+    features_s --> props_s["properties\ncontroller · routes"]
+    features_s --> apps_s["applications\ncontroller · routes"]
+    features_s --> leases_s["leases\ncontroller · routes"]
+    features_s --> tenants_s["tenants\ncontroller · routes"]
+    features_s --> managers_s["managers\ncontroller · routes"]
+
+    lib_s --> prisma["prisma.ts\nsingleton client"]
 ```
 
 ---
