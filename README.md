@@ -26,22 +26,22 @@ This project is a deliberate exercise in **production-ready architecture**: cust
 
 ---
 
-## Architectural Decisions Worth Noting
+## Architecture
 
-**Custom JWT auth over managed identity (Cognito)**
-The original codebase used AWS Cognito with `jwt.decode()` (no signature verification), meaning any client could forge a token. This was replaced with `bcryptjs` + `jsonwebtoken` using `jwt.verify()` against a server-held secret, with a unified `User` model (replacing separate `Manager`/`Tenant` tables) and role stored in the token payload.
+**Custom JWT auth, not a managed identity provider**
+Auth is built on `bcryptjs` + `jsonwebtoken` with `jwt.verify()` against a server-held secret. Managed providers like Cognito add vendor lock-in and often push you toward `jwt.decode()` with no signature verification. A single `User` model with a `role` field handles both tenants and managers cleanly, with no split tables.
 
-**PostGIS spatial queries with Neon**
-Property search uses raw `ST_DWithin` + `ST_SetSRID` PostGIS queries via Prisma's `$queryRaw`, parameterized to prevent injection. Neon provides the serverless PostgreSQL layer with pooled + direct URL support for Prisma's connection management.
+**PostGIS spatial queries via Prisma raw**
+Property search uses `ST_DWithin` + `ST_SetSRID` through Prisma's `$queryRaw` with parameterized inputs to prevent injection. Neon provides the serverless PostgreSQL layer with both pooled and direct URL support, which Prisma requires for connection management in serverless environments.
 
-**Feature-based architecture on both ends**
-Both the Express server and Next.js client are organized by domain feature rather than by file type. Each server feature owns its controller, routes, and any feature-specific middleware. The client separates feature components, shared UI, and state cleanly.
+**Feature-based structure on both client and server**
+Both Express and Next.js are organized by domain feature rather than by file type. Each server feature owns its controller, routes, and any feature-specific middleware. The client separates feature components, shared UI, and Redux state by domain. Pages in `app/` are thin wrappers.
 
-**RTK Query with proper cache invalidation**
+**RTK Query with typed cache invalidation**
 All API calls go through RTK Query endpoints with typed tag-based cache invalidation. Mutations invalidate only the tags they affect, preventing stale data without over-fetching.
 
-**Duplicate lease bug fixed**
-The original code created a `Lease` record immediately when an application was submitted, then created a second one on manager approval, leaving orphaned leases on every denial. Applications now create no lease; the lease is created inside a Prisma transaction only on approval, atomically connecting the tenant to the property.
+**Lease creation is transactional and gated on approval**
+Applications carry a `leaseId` that starts null. On manager approval, the lease is created inside a Prisma transaction and atomically linked to the application. No lease is created on submission or denial, so there are no orphaned records.
 
 ---
 
