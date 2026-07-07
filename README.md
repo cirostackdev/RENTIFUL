@@ -260,11 +260,9 @@ cd client && npm install && npm run dev   # → http://localhost:3000
 
 ## API Reference
 
-Full interactive docs (request/response schemas, auth, try-it-out):
-
-**[cirostackdev.github.io/RENTIFUL](https://cirostackdev.github.io/RENTIFUL)**
-
-> To enable: go to repo **Settings → Pages → Source: Deploy from branch → main → /docs**
+<a href="https://cirostackdev.github.io/RENTIFUL" target="_blank">
+  <img src="https://img.shields.io/badge/API_Docs-View_Interactive_Docs-0d1117?style=for-the-badge&logo=swagger&logoColor=85EA2D" alt="API Docs" />
+</a>
 
 ---
 
