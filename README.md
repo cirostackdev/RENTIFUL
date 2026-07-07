@@ -65,22 +65,28 @@ Applications carry a `leaseId` that starts null. On manager approval, the lease 
 ![Zod](https://img.shields.io/badge/Zod-0d1117?style=flat-square&logo=zod&logoColor=58a6ff)
 ![Mapbox GL](https://img.shields.io/badge/Mapbox_GL-0d1117?style=flat-square&logo=mapbox&logoColor=58a6ff)
 
-</td>
-<td valign="top" width="50%">
-
 **Backend**
 
 ![Node.js](https://img.shields.io/badge/Node.js-0d1117?style=flat-square&logo=nodedotjs&logoColor=58a6ff)
 ![Express](https://img.shields.io/badge/Express-0d1117?style=flat-square&logo=express&logoColor=58a6ff)
 ![TypeScript](https://img.shields.io/badge/TypeScript-0d1117?style=flat-square&logo=typescript&logoColor=58a6ff)
-![Prisma](https://img.shields.io/badge/Prisma-0d1117?style=flat-square&logo=prisma&logoColor=58a6ff)
+![Multer](https://img.shields.io/badge/Multer-0d1117?style=flat-square&logo=nodedotjs&logoColor=58a6ff)
+
+</td>
+<td valign="top" width="50%">
+
+**Database**
+
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-0d1117?style=flat-square&logo=postgresql&logoColor=58a6ff)
 ![PostGIS](https://img.shields.io/badge/PostGIS-0d1117?style=flat-square&logo=postgresql&logoColor=58a6ff)
+![Prisma](https://img.shields.io/badge/Prisma-0d1117?style=flat-square&logo=prisma&logoColor=58a6ff)
 ![Neon](https://img.shields.io/badge/Neon-0d1117?style=flat-square&logo=neon&logoColor=58a6ff)
+
+**Security**
+
 ![JWT](https://img.shields.io/badge/JWT-0d1117?style=flat-square&logo=jsonwebtokens&logoColor=58a6ff)
 ![bcryptjs](https://img.shields.io/badge/bcryptjs-0d1117?style=flat-square&logo=letsencrypt&logoColor=58a6ff)
 ![Helmet](https://img.shields.io/badge/Helmet-0d1117?style=flat-square&logo=express&logoColor=58a6ff)
-![Multer](https://img.shields.io/badge/Multer-0d1117?style=flat-square&logo=nodedotjs&logoColor=58a6ff)
 
 </td>
 </tr>
