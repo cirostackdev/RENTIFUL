@@ -290,9 +290,7 @@ npm run lint         # ESLint
 
 [Jessy Chidera Onah](https://github.com/cirostackdev)
 
-Founder
-
-<a href="https://cirostack.com"><img src="./assets/cirostack-wordmark.svg" alt="CiroStack" height="20" /></a>
+<a href="https://cirostack.com"><img src="./assets/cirostack-wordmark.svg" alt="CiroStack" height="40" /></a>
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/jessyonah)
 [![Email](https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:jessychideraonah@gmail.com)
