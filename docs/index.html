@@ -6,8 +6,163 @@
     <title>Rentiful API Docs</title>
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
     <style>
-      body { margin: 0; }
+      body { margin: 0; background: #0d1117; }
       .topbar { display: none; }
+
+      /* Base */
+      .swagger-ui { background: #0d1117; }
+      .swagger-ui .wrapper { background: #0d1117; }
+
+      /* Info block */
+      .swagger-ui .info .title,
+      .swagger-ui .info p,
+      .swagger-ui .info li,
+      .swagger-ui .info table thead tr th,
+      .swagger-ui .info table tbody tr td { color: #e6edf3; }
+      .swagger-ui .info a { color: #58a6ff; }
+      .swagger-ui .info .base-url { color: #8b949e; }
+
+      /* Filter input */
+      .swagger-ui .filter-container { background: #0d1117; }
+      .swagger-ui .filter-container .operation-filter-input {
+        background: #161b22;
+        border: 1px solid #30363d;
+        color: #e6edf3;
+      }
+
+      /* Scheme container */
+      .swagger-ui .scheme-container {
+        background: #161b22;
+        box-shadow: none;
+        border-bottom: 1px solid #30363d;
+      }
+      .swagger-ui .scheme-container .schemes label { color: #8b949e; }
+      .swagger-ui .scheme-container .schemes select {
+        background: #0d1117;
+        color: #e6edf3;
+        border: 1px solid #30363d;
+      }
+
+      /* Tags */
+      .swagger-ui .opblock-tag {
+        color: #e6edf3;
+        border-bottom: 1px solid #30363d;
+      }
+      .swagger-ui .opblock-tag:hover { background: #161b22; }
+      .swagger-ui .opblock-tag small { color: #8b949e; }
+
+      /* Operation blocks */
+      .swagger-ui .opblock {
+        background: #161b22;
+        border: 1px solid #30363d;
+        box-shadow: none;
+      }
+      .swagger-ui .opblock .opblock-summary { border-bottom: 1px solid #30363d; }
+      .swagger-ui .opblock .opblock-summary-description { color: #e6edf3; }
+      .swagger-ui .opblock .opblock-summary-path,
+      .swagger-ui .opblock .opblock-summary-path__deprecated { color: #e6edf3; }
+      .swagger-ui .opblock .opblock-body { background: #0d1117; }
+
+      /* Method badges */
+      .swagger-ui .opblock.opblock-get    { border-color: #1f6feb; background: rgba(31,111,235,0.1); }
+      .swagger-ui .opblock.opblock-post   { border-color: #238636; background: rgba(35,134,54,0.1); }
+      .swagger-ui .opblock.opblock-put    { border-color: #9e6a03; background: rgba(158,106,3,0.1); }
+      .swagger-ui .opblock.opblock-delete { border-color: #da3633; background: rgba(218,54,51,0.1); }
+      .swagger-ui .opblock.opblock-get    .opblock-summary-method { background: #1f6feb; }
+      .swagger-ui .opblock.opblock-post   .opblock-summary-method { background: #238636; }
+      .swagger-ui .opblock.opblock-put    .opblock-summary-method { background: #9e6a03; }
+      .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #da3633; }
+
+      /* Parameters and body */
+      .swagger-ui .opblock-description-wrapper p,
+      .swagger-ui .opblock-external-docs-wrapper p,
+      .swagger-ui .opblock-title_normal p { color: #e6edf3; }
+      .swagger-ui table thead tr th,
+      .swagger-ui table thead tr td { color: #8b949e; border-bottom: 1px solid #30363d; }
+      .swagger-ui .parameters-container .parameters tbody tr td { color: #e6edf3; }
+      .swagger-ui .parameter__name { color: #e6edf3; }
+      .swagger-ui .parameter__type { color: #8b949e; }
+      .swagger-ui .parameter__in  { color: #8b949e; }
+      .swagger-ui .parameter__deprecated { color: #da3633; }
+
+      /* Textarea / input */
+      .swagger-ui textarea,
+      .swagger-ui input[type=text],
+      .swagger-ui input[type=email],
+      .swagger-ui input[type=password],
+      .swagger-ui select {
+        background: #0d1117;
+        color: #e6edf3;
+        border: 1px solid #30363d;
+      }
+      .swagger-ui textarea:focus,
+      .swagger-ui input:focus { border-color: #58a6ff; outline: none; }
+
+      /* Response section */
+      .swagger-ui .responses-inner { background: #0d1117; }
+      .swagger-ui .response-col_status { color: #e6edf3; }
+      .swagger-ui .response-col_description { color: #8b949e; }
+      .swagger-ui .response-col_links { color: #8b949e; }
+      .swagger-ui .responses-table thead tr th { color: #8b949e; }
+
+      /* Code / pre */
+      .swagger-ui .microlight,
+      .swagger-ui pre.microlight { background: #161b22; color: #e6edf3; }
+      .swagger-ui code { background: #161b22; color: #e6edf3; }
+
+      /* Models section */
+      .swagger-ui section.models { border: 1px solid #30363d; }
+      .swagger-ui section.models h4 { color: #e6edf3; border-bottom: 1px solid #30363d; }
+      .swagger-ui section.models .model-container { background: #161b22; }
+      .swagger-ui .model-title { color: #e6edf3; }
+      .swagger-ui .model { color: #e6edf3; }
+      .swagger-ui .model .property { color: #8b949e; }
+      .swagger-ui .model .property.primitive { color: #3fb950; }
+      .swagger-ui .prop-type { color: #58a6ff; }
+      .swagger-ui .prop-format { color: #8b949e; }
+
+      /* Authorize button */
+      .swagger-ui .btn.authorize {
+        background: transparent;
+        border-color: #58a6ff;
+        color: #58a6ff;
+      }
+      .swagger-ui .btn.authorize:hover { background: rgba(88,166,255,0.1); }
+      .swagger-ui .btn.authorize svg { fill: #58a6ff; }
+
+      /* Execute button */
+      .swagger-ui .btn.execute {
+        background: #238636;
+        border-color: #238636;
+        color: #fff;
+      }
+      .swagger-ui .btn.execute:hover { background: #2ea043; }
+
+      /* General buttons */
+      .swagger-ui .btn { color: #e6edf3; }
+
+      /* Arrow icons */
+      .swagger-ui .arrow { fill: #8b949e; }
+
+      /* Links */
+      .swagger-ui a { color: #58a6ff; }
+      .swagger-ui a:hover { color: #79c0ff; }
+
+      /* Auth modal */
+      .swagger-ui .dialog-ux .modal-ux {
+        background: #161b22;
+        border: 1px solid #30363d;
+      }
+      .swagger-ui .dialog-ux .modal-ux-header { border-bottom: 1px solid #30363d; }
+      .swagger-ui .dialog-ux .modal-ux-header h3 { color: #e6edf3; }
+      .swagger-ui .dialog-ux .modal-ux-content p,
+      .swagger-ui .dialog-ux .modal-ux-content label { color: #8b949e; }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: #0d1117; }
+      ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #8b949e; }
     </style>
   </head>
   <body>
