@@ -1,0 +1,910 @@
+openapi: 3.0.3
+
+info:
+  title: Rentiful API
+  description: |
+    REST API for the Rentiful rental property marketplace.
+
+    **Authentication:** Protected routes require a Bearer JWT token in the `Authorization` header.
+    ```
+    Authorization: Bearer <token>
+    ```
+    Tokens are issued by `/auth/register` and `/auth/login` and expire after **7 days**.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3002
+    description: Local development
+
+tags:
+  - name: Health
+    description: Server status
+  - name: Auth
+    description: Registration, login, and profile
+  - name: Properties
+    description: Property listings with spatial search
+  - name: Applications
+    description: Rental applications and approval flow
+  - name: Leases
+    description: Active leases and payment history
+  - name: Tenants
+    description: Tenant profiles and saved favorites
+  - name: Managers
+    description: Manager profiles and property listings
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Something went wrong
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [tenant, manager]
+        name:
+          type: string
+        phoneNumber:
+          type: string
+
+    UserWithTimestamp:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+
+    Coordinates:
+      type: object
+      properties:
+        longitude:
+          type: number
+        latitude:
+          type: number
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        postalCode:
+          type: string
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+
+    Property:
+      type: object
+      properties:
+        id:
+          type: integer
+        managerId:
+          type: string
+        locationId:
+          type: integer
+        propertyType:
+          type: string
+          enum: [Rooms, Tinyhouse, Apartment, Villa, Townhouse, Cottage]
+        amenities:
+          type: array
+          items:
+            type: string
+        highlights:
+          type: array
+          items:
+            type: string
+        photoUrls:
+          type: array
+          items:
+            type: string
+        pricePerMonth:
+          type: number
+        securityDeposit:
+          type: number
+        applicationFee:
+          type: number
+        beds:
+          type: integer
+        baths:
+          type: number
+        squareFeet:
+          type: integer
+        isPetsAllowed:
+          type: boolean
+        isParkingIncluded:
+          type: boolean
+        postedDate:
+          type: string
+          format: date-time
+        location:
+          $ref: '#/components/schemas/Location'
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    PropertiesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum: [Pending, Approved, Denied]
+        applicationDate:
+          type: string
+          format: date-time
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+        message:
+          type: string
+        propertyId:
+          type: integer
+        tenantId:
+          type: string
+        leaseId:
+          type: integer
+          nullable: true
+
+    Lease:
+      type: object
+      properties:
+        id:
+          type: integer
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        rent:
+          type: number
+        deposit:
+          type: number
+        propertyId:
+          type: integer
+        tenantId:
+          type: string
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        leaseId:
+          type: integer
+        amountDue:
+          type: number
+        amountPaid:
+          type: number
+        dueDate:
+          type: string
+          format: date-time
+        paymentDate:
+          type: string
+          format: date-time
+          nullable: true
+        paymentStatus:
+          type: string
+          enum: [Pending, Paid, PartiallyPaid, Overdue]
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        '200':
+          description: Server is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name, role]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                role:
+                  type: string
+                  enum: [tenant, manager]
+                phoneNumber:
+                  type: string
+      responses:
+        '201':
+          description: Registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Missing required fields or invalid role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithTimestamp'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags: [Auth]
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phoneNumber:
+                  type: string
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /properties:
+    get:
+      tags: [Properties]
+      summary: List properties
+      description: Paginated, filterable list. Supports PostGIS spatial search via `latitude` + `longitude` (1000km radius).
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - in: query
+          name: priceMin
+          schema:
+            type: number
+        - in: query
+          name: priceMax
+          schema:
+            type: number
+        - in: query
+          name: beds
+          schema:
+            type: string
+            description: Minimum number of beds, or "any"
+        - in: query
+          name: baths
+          schema:
+            type: string
+            description: Minimum number of baths, or "any"
+        - in: query
+          name: propertyType
+          schema:
+            type: string
+            enum: [Rooms, Tinyhouse, Apartment, Villa, Townhouse, Cottage, any]
+        - in: query
+          name: amenities
+          schema:
+            type: string
+            description: Comma-separated amenity values
+        - in: query
+          name: squareFeetMin
+          schema:
+            type: number
+        - in: query
+          name: squareFeetMax
+          schema:
+            type: number
+        - in: query
+          name: availableFrom
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: latitude
+          schema:
+            type: number
+          description: Center latitude for spatial search (pair with longitude)
+        - in: query
+          name: longitude
+          schema:
+            type: number
+          description: Center longitude for spatial search (pair with latitude)
+        - in: query
+          name: favoriteIds
+          schema:
+            type: string
+          description: Comma-separated property IDs to filter by
+      responses:
+        '200':
+          description: Paginated property list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertiesResponse'
+
+    post:
+      tags: [Properties]
+      summary: Create a property
+      description: |
+        Manager only. Accepts `multipart/form-data` with up to 10 photos (JPEG, PNG, WebP, AVIF, max 10MB each).
+        Address is geocoded automatically via Nominatim (OpenStreetMap).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [address, city, state, country, postalCode, propertyType, pricePerMonth, securityDeposit, applicationFee, beds, baths, squareFeet]
+              properties:
+                photos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Up to 10 images (JPEG, PNG, WebP, AVIF, max 10MB each)
+                address:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                postalCode:
+                  type: string
+                propertyType:
+                  type: string
+                  enum: [Rooms, Tinyhouse, Apartment, Villa, Townhouse, Cottage]
+                amenities:
+                  type: string
+                  description: Comma-separated list
+                highlights:
+                  type: string
+                  description: Comma-separated list
+                isPetsAllowed:
+                  type: string
+                  enum: ["true", "false"]
+                isParkingIncluded:
+                  type: string
+                  enum: ["true", "false"]
+                pricePerMonth:
+                  type: string
+                securityDeposit:
+                  type: string
+                applicationFee:
+                  type: string
+                beds:
+                  type: string
+                baths:
+                  type: string
+                squareFeet:
+                  type: string
+      responses:
+        '201':
+          description: Property created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Manager role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /properties/{id}:
+    get:
+      tags: [Properties]
+      summary: Get a single property
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Property with location coordinates and manager info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+        '404':
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications:
+    get:
+      tags: [Applications]
+      summary: List applications
+      description: Filter by `userId` + `userType`. Tenants see their own; managers see applications for their properties.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+        - in: query
+          name: userType
+          schema:
+            type: string
+            enum: [tenant, manager]
+      responses:
+        '200':
+          description: Applications with nested property and tenant info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+    post:
+      tags: [Applications]
+      summary: Submit a rental application
+      description: Tenant only. One active (Pending or Approved) application per property per tenant is enforced.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [applicationDate, propertyId, name, email, phoneNumber]
+              properties:
+                applicationDate:
+                  type: string
+                  format: date-time
+                propertyId:
+                  type: integer
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phoneNumber:
+                  type: string
+                message:
+                  type: string
+      responses:
+        '201':
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '404':
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Active application already exists for this property
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications/{id}/status:
+    put:
+      tags: [Applications]
+      summary: Approve or deny an application
+      description: |
+        Manager only. Approving creates a 1-year lease transactionally and links it to the application.
+        Only Pending applications can be updated.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [Approved, Denied]
+      responses:
+        '200':
+          description: Updated application — includes lease if Approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Application is not in Pending status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /leases:
+    get:
+      tags: [Leases]
+      summary: List leases
+      description: Managers see leases for their properties; tenants see their own leases.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Leases with tenant and property info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lease'
+
+  /leases/{id}/payments:
+    get:
+      tags: [Leases]
+      summary: Get payment history for a lease
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payments ordered by dueDate descending
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /tenants/{userId}:
+    get:
+      tags: [Tenants]
+      summary: Get tenant profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tenant profile with saved favorites
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      favorites:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Property'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tenants/{userId}/current-residences:
+    get:
+      tags: [Tenants]
+      summary: Get tenant's active rentals
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Properties the tenant is currently renting
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Property'
+
+  /tenants/{userId}/favorites/{propertyId}:
+    post:
+      tags: [Tenants]
+      summary: Add property to favorites
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: propertyId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated tenant with favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Tenant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Property already in favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Tenants]
+      summary: Remove property from favorites
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: propertyId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated tenant with favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /managers/{userId}:
+    get:
+      tags: [Managers]
+      summary: Get manager profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Manager profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Manager not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /managers/{userId}/properties:
+    get:
+      tags: [Managers]
+      summary: Get all properties owned by a manager
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Properties with location coordinates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Property'

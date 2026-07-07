@@ -260,57 +260,11 @@ cd client && npm install && npm run dev   # → http://localhost:3000
 
 ## API Reference
 
-### Auth
+Full interactive docs (request/response schemas, auth, try-it-out):
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/auth/register` | None | Register (`email`, `password`, `name`, `role`, `phoneNumber`) |
-| `POST` | `/auth/login` | None | Sign in → `{ token, user }` |
-| `GET` | `/auth/me` | ✓ | Current user |
-| `PUT` | `/auth/me` | ✓ | Update profile |
+**[cirostackdev.github.io/RENTIFUL](https://cirostackdev.github.io/RENTIFUL)**
 
-All protected routes require `Authorization: Bearer <token>`.
-
-### Properties
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/properties` | None | Paginated, filterable list |
-| `GET` | `/properties/:id` | None | Single property with coordinates |
-| `POST` | `/properties` | Manager | Create (`multipart/form-data`) |
-
-**Filter params:** `page`, `limit`, `priceMin`, `priceMax`, `beds`, `baths`, `propertyType`, `amenities`, `squareFeetMin`, `squareFeetMax`, `availableFrom`, `latitude`, `longitude`, `favoriteIds`
-
-### Applications
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/applications?userId=&userType=` | ✓ | List by user |
-| `POST` | `/applications` | Tenant | Submit (one active per property) |
-| `PUT` | `/applications/:id/status` | Manager | `Approved` or `Denied` |
-
-### Leases
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/leases` | ✓ | Current user's leases |
-| `GET` | `/leases/:id/payments` | ✓ | Payment history |
-
-### Tenants
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/tenants/:userId` | ✓ | Profile + favorites |
-| `GET` | `/tenants/:userId/current-residences` | ✓ | Active rentals |
-| `POST` | `/tenants/:userId/favorites/:propertyId` | ✓ | Add favorite |
-| `DELETE` | `/tenants/:userId/favorites/:propertyId` | ✓ | Remove favorite |
-
-### Managers
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/managers/:userId` | ✓ | Profile |
-| `GET` | `/managers/:userId/properties` | ✓ | Listings |
+> To enable: go to repo **Settings → Pages → Source: Deploy from branch → main → /docs**
 
 ---
 
