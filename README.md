@@ -288,11 +288,11 @@ npm run lint         # ESLint
 
 <div align="center">
 
-Jessy Chidera Onah
-
-<a href="https://cirostack.com"><img src="./assets/cirostack-wordmark.svg" alt="CiroStack" height="120" /></a>
+[Jessy Chidera Onah](https://github.com/cirostackdev)
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/jessyonah)
 [![Email](https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:jessychideraonah@gmail.com)
+
+<a href="https://cirostack.com"><img src="./assets/cirostack-wordmark.svg" alt="CiroStack" height="120" /></a>
 
 </div>
