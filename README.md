@@ -135,6 +135,7 @@ graph LR
 ## Data Model
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryTextColor': '#58a6ff'}}}%%
 erDiagram
     User {
         string id PK
