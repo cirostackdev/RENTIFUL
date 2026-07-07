@@ -288,7 +288,7 @@ npm run lint         # ESLint
 
 <div align="center">
 
-[Jessy Chidera Onah](https://github.com/cirostackdev)
+Jessy Chidera Onah
 
 <a href="https://cirostack.com"><img src="./assets/cirostack-wordmark.svg" alt="CiroStack" height="120" /></a>
 
