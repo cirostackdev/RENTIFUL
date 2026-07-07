@@ -90,6 +90,9 @@ Applications carry a `leaseId` that starts null. On manager approval, the lease 
 
 ## Project Structure
 
+<details>
+<summary>Show directory tree</summary>
+
 ```
 rentiful/
 ├── client/
@@ -121,45 +124,69 @@ rentiful/
             └── prisma.ts              # Singleton client (connection pooling)
 ```
 
+</details>
+
 ---
 
 ## Data Model
 
-```
-User ──────────────────────────────────────────────────────────────
-  id           String (UUID, PK)
-  email        String (unique)
-  passwordHash String
-  role         tenant | manager
-  name, phoneNumber
+```mermaid
+erDiagram
+    User {
+        string id PK
+        string email
+        string passwordHash
+        string role "tenant | manager"
+        string name
+        string phoneNumber
+    }
+    Location {
+        string id PK
+        string coordinates "PostGIS Point(4326)"
+    }
+    Property {
+        string id PK
+        string managerId FK
+        string locationId FK
+        string propertyType "Rooms|Tinyhouse|Apartment|Villa|Townhouse|Cottage"
+        float pricePerMonth
+        float securityDeposit
+        float applicationFee
+        int beds
+        int baths
+        float squareFeet
+        bool isPetsAllowed
+        bool isParkingIncluded
+    }
+    Application {
+        string id PK
+        string tenantId FK
+        string propertyId FK
+        string status "Pending | Approved | Denied"
+        string leaseId FK "null until Approved"
+    }
+    Lease {
+        string id PK
+        string tenantId FK
+        string propertyId FK
+        date startDate
+        date endDate
+        float rent
+        float deposit
+    }
+    Payment {
+        string id PK
+        string leaseId FK
+        string paymentStatus "Pending | Paid | PartiallyPaid | Overdue"
+    }
 
-Property ──────────────────────────────────────────────────────────
-  managerId    → User
-  locationId   → Location
-  propertyType Rooms | Tinyhouse | Apartment | Villa | Townhouse | Cottage
-  amenities    Amenity[]  ·  highlights  Highlight[]
-  photoUrls    String[]
-  pricePerMonth, securityDeposit, applicationFee
-  beds, baths, squareFeet
-  isPetsAllowed, isParkingIncluded
-
-Location ──────────────────────────────────────────────────────────
-  coordinates  geography(Point, 4326)   ← PostGIS
-
-Application ───────────────────────────────────────────────────────
-  tenantId     → User
-  propertyId   → Property
-  status       Pending | Approved | Denied
-  leaseId      → Lease   (null until Approved)
-
-Lease ─────────────────────────────────────────────────────────────
-  tenantId     → User
-  propertyId   → Property
-  startDate, endDate, rent, deposit
-
-Payment ────────────────────────────────────────────────────────────
-  leaseId      → Lease
-  paymentStatus  Pending | Paid | PartiallyPaid | Overdue
+    User ||--o{ Property        : "manages"
+    User ||--o{ Application     : "submits"
+    User ||--o{ Lease           : "holds"
+    Location ||--o{ Property    : "hosts"
+    Property ||--o{ Application : "receives"
+    Application ||--o| Lease    : "creates on approval"
+    Lease ||--o{ Payment        : "billed via"
 ```
 
 ---
